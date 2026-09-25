@@ -1,0 +1,79 @@
+# CMGCO: Curriculum-Guided Multi-Reward Group-Comparative Optimization
+# Default Configuration for HCFNet on SIRST-v1 (Ablation benchmark setting)
+
+exp:
+  name: CMGCO_HCFNet_SIRST
+  save_dir: ./experiments/CMGCO_HCFNet_SIRST
+  device: 0
+  seed: 0
+
+# Detector Architecture
+model:
+  type: HCFnet
+  in_channels: 3
+  out_channels: 1
+  base_channels: 32
+  deep_supervision: True
+
+# Model-Aware Curriculum Learning (CL)
+curriculum:
+  enabled: True
+  bootstrap_epochs: 20 # Phase I: 1 to 20 epochs full-data bootstrap
+  readiness_threshold: 0.5 # tau_c = 0.5 (readiness threshold)
+  update_interval: 5 # K = 5 (reassess readiness every 5 epochs)
+  force_all_epoch: 220 # e_all = 220 (Phase III: full-data refinement)
+
+# Multi-Reward Group-Comparative Preference Optimization (MGCPO)
+mgcpo:
+  enabled: True
+  activation_epoch: 20 # e_act = 20 (activated after 20-epoch warm-up)
+  weight: 1.0 # alpha(e) = 1.0 once activated
+  group_size: 16 # G = 16 candidates per sample
+  temperature: 1.0 # tau_s = 1.0 (perturbation temperature)
+  threshold: 0.5 # binarization threshold delta = 0.5
+  # Reward Weights: (lambda_IoU, lambda_Det, lambda_FA, lambda_Frag)
+  iou_weight: 2.5 # r_IoU: overlap agreement
+  detection_weight: 1.0 # r_Det: target discovery
+  false_alarm_weight: 1.0 # r_FA: false alarm component penalty
+  fragmentation_weight: 0.3 # r_Frag: surplus fragmentation penalty
+
+# Supervised Loss
+loss:
+  type: hcfnet
+  side_weights: [0.5, 0.25, 0.125, 0.0625]
+
+# Training Parameters
+train:
+  batch_size: 4
+  val_batch_size: 1
+  epochs: 300
+  num_workers: 0
+  save_interval: 50
+  val_interval: 1
+
+# Optimizer and Learning Rate Scheduler
+optim:
+  type: AdamW
+  lr: !!float 5e-4
+  weight_decay: !!float 1e-4
+  betas: [0.9, 0.999]
+
+scheduler:
+  type: CosineAnnealingLR
+  step_interval: iter
+  eta_min: !!float 1e-5
+
+# Datasets
+dataset:
+  train:
+    data_root: ./datasets/NUAA-SIRST
+    idx_file: img_idx/train_NUAA-SIRST.txt
+    img_size: 512
+    in_channels: 3
+    preprocessing: hcfnet
+  val:
+    data_root: ./datasets/NUAA-SIRST
+    idx_file: img_idx/test_NUAA-SIRST.txt
+    img_size: 512
+    in_channels: 3
+    preprocessing: hcfnet

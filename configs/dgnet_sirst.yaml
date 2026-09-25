@@ -1,0 +1,77 @@
+# CMGCO: Configuration for DGNet on SIRST-v1
+
+exp:
+  name: CMGCO_DGNet_SIRST
+  save_dir: ./experiments/CMGCO_DGNet_SIRST
+  device: 0
+  seed: 42
+
+# Detector Architecture
+model:
+  type: DGNet
+  in_channels: 1
+  out_channels: 1
+  text_features: ./weights/dgnet/dgnet_text_features.pth
+
+# Model-Aware Curriculum Learning (CL)
+curriculum:
+  enabled: True
+  bootstrap_epochs: 20
+  readiness_threshold: 0.5
+  update_interval: 5
+  force_all_epoch: 220
+
+# Multi-Reward Group-Comparative Preference Optimization (MGCPO)
+mgcpo:
+  enabled: True
+  activation_epoch: 20
+  weight: 1.0
+  group_size: 16
+  temperature: 1.0
+  threshold: 0.5
+  iou_weight: 2.5
+  detection_weight: 1.0
+  false_alarm_weight: 1.0
+  fragmentation_weight: 0.3
+
+# Supervised Loss
+loss:
+  type: dgnet
+  cda:
+    enabled: true
+    ratio: 0.8
+    checkpoint: ./weights/dgnet/ViT-B-32.pt
+
+# Training Parameters
+train:
+  batch_size: 16
+  val_batch_size: 1
+  epochs: 600
+  num_workers: 0
+  save_interval: 50
+  val_interval: 1
+
+# Optimizer and Learning Rate Scheduler
+optim:
+  type: Adam
+  lr: !!float 5e-4
+
+scheduler:
+  type: MultiStepLR
+  step_interval: epoch
+  milestones: [300, 450]
+  gamma: 0.9
+
+# Datasets
+dataset:
+  train:
+    data_root: ./datasets/NUAA-SIRST
+    idx_file: img_idx/train_NUAA-SIRST.txt
+    img_size: 256
+    in_channels: 1
+  val:
+    data_root: ./datasets/NUAA-SIRST
+    idx_file: img_idx/test_NUAA-SIRST.txt
+    img_size: 256
+    in_channels: 1
+

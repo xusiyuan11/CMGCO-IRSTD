@@ -1,0 +1,68 @@
+# SAMamba source training protocol with paper-defined CMGCO/MGCPO.
+
+exp:
+  name: CMGCO_SAMamba_SIRST
+  save_dir: ./experiments/CMGCO_SAMamba_SIRST
+  device: 0
+  seed: 0
+
+model:
+  type: SAMamba
+  in_channels: 3
+  out_channels: 1
+  checkpoint: ./weights/samamba/sam2_hiera_small.pt
+
+curriculum:
+  enabled: true
+  bootstrap_epochs: 20
+  readiness_threshold: 0.5
+  update_interval: 5
+  force_all_epoch: 220
+
+mgcpo:
+  enabled: true
+  activation_epoch: 20
+  weight: 1.0
+  group_size: 16
+  temperature: 1.0
+  threshold: 0.5
+  iou_weight: 2.5
+  detection_weight: 1.0
+  false_alarm_weight: 1.0
+  fragmentation_weight: 0.3
+
+loss:
+  type: samamba
+
+train:
+  batch_size: 2
+  val_batch_size: 1
+  epochs: 400
+  num_workers: 1
+  save_interval: 150
+  val_interval: 1
+
+optim:
+  type: AdamW
+  lr: !!float 5e-4
+  weight_decay: !!float 1e-4
+  betas: [0.9, 0.999]
+
+scheduler:
+  type: CosineAnnealingLR
+  step_interval: iter
+  eta_min: !!float 1e-5
+
+dataset:
+  train:
+    data_root: ./datasets/NUAA-SIRST
+    idx_file: img_idx/train_NUAA-SIRST.txt
+    img_size: 1024
+    in_channels: 3
+    preprocessing: samamba
+  val:
+    data_root: ./datasets/NUAA-SIRST
+    idx_file: img_idx/test_NUAA-SIRST.txt
+    img_size: 1024
+    in_channels: 3
+    preprocessing: samamba

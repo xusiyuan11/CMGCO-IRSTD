@@ -1,0 +1,71 @@
+# CMGCO: Configuration for MSDANet on SIRST-v1
+
+exp:
+  name: CMGCO_MSDANet_SIRST
+  save_dir: ./experiments/CMGCO_MSDANet_SIRST
+  device: 0
+  seed: 42
+
+# Detector Architecture
+model:
+  type: MSDANet
+  in_channels: 3
+  out_channels: 1
+
+# Model-Aware Curriculum Learning (CL)
+curriculum:
+  enabled: True
+  bootstrap_epochs: 20
+  readiness_threshold: 0.5
+  update_interval: 5
+  force_all_epoch: 220
+
+# Multi-Reward Group-Comparative Preference Optimization (MGCPO)
+mgcpo:
+  enabled: True
+  activation_epoch: 20
+  weight: 1.0
+  group_size: 16
+  temperature: 1.0
+  threshold: 0.5
+  iou_weight: 2.5
+  detection_weight: 1.0
+  false_alarm_weight: 1.0
+  fragmentation_weight: 0.3
+
+# Supervised Loss
+loss:
+  type: msdanet
+
+# Training Parameters
+train:
+  batch_size: 4
+  val_batch_size: 1
+  epochs: 500
+  num_workers: 0
+  save_interval: 50
+  val_interval: 1
+
+# Optimizer and Learning Rate Scheduler
+optim:
+  type: Adam
+  lr: !!float 1e-4
+
+scheduler:
+  type: none
+
+# Datasets
+dataset:
+  train:
+    data_root: ./datasets/NUAA-SIRST
+    idx_file: img_idx/train_NUAA-SIRST.txt
+    img_size: 512
+    in_channels: 3
+    preprocessing: msdanet
+  val:
+    data_root: ./datasets/NUAA-SIRST
+    idx_file: img_idx/test_NUAA-SIRST.txt
+    img_size: 512
+    in_channels: 3
+    preprocessing: msdanet
+

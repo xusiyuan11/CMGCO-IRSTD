@@ -1,0 +1,93 @@
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Experiment outputs, weights & checkpoints (do not commit large weights to Git)
+experiments/
+checkpoints/
+weights*/
+pretrained*/
+states/
+training_states/
+/nudt irstd origin/
+# Keep models/ tracked: it contains the detector source code.
+*.pth
+*.pth.*
+*.pt
+*.pt.*
+*.pt2
+*.ckpt
+*.ckpt.*
+*.state
+*.safetensors
+*.pkl
+*.pickle
+*.bin
+*.weights
+*.params
+*.onnx
+*.onnx.data
+*.h5
+*.hdf5
+*.keras
+*.tflite
+*.torchscript
+*.engine
+*.pdparams
+*.pdopt
+*.pdmodel
+*.pdiparams*
+*.data-?????-of-?????
+
+# Datasets
+data/raw/
+dataset/
+# Keep dataset payloads local, but track each dataset's img_idx split lists.
+/datasets/*
+!/datasets/*/
+/datasets/*/*
+!/datasets/*/img_idx/
+/datasets/*/img_idx/*
+!/datasets/*/img_idx/*.txt
+
+# Downloaded and archived model/data payloads
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+*.7z
+*.rar
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs & outputs
+*.log
+results/
+visualization/
+runs/
+wandb/
+events.out.tfevents.*
+
+# Local analysis and manuscript-preparation artifacts
+/ablation_fa_retest/
+/paper_fa_retest/
+/hcfnet_best_mean_fa.xlsx
+/configs/test.yaml
+/verify_datasets.py
+/verify_runnable.py
+*.csv
+*.xlsx
+*_preview.png
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
